@@ -5,13 +5,13 @@ import (
 	"net/http"
 )
 
-const BASE_URL = "/auth"
+const AUTH_RESOURCE = "/auth"
 
 var AuthenticationRoutes = []Route{
 	{
-		Uri: "/login",
-		Method: http.MethodPost,
-		Function: controllers.Login,
+		Uri:                   AUTH_RESOURCE + "/login",
+		Method:                http.MethodPost,
+		Function:              controllers.Login,
 		RequireAuthentication: false,
 	},
 }

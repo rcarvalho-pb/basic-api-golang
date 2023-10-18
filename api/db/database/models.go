@@ -46,10 +46,10 @@ func (u *User) validateUser(stage Type) error {
 	if u.Nick == "" {
 		return errors.New("nick field is mandatory")
 	}
-	nickRegexp := regexp.MustCompile(`^([\w\d\?\!\_\-\+])$`)
-	if !nickRegexp.MatchString(u.Nick) {
-		return errors.New("inválid nick format")
-	}
+	// nickRegexp := regexp.MustCompile(`^([\w\d\?\!\_\-\+])$`)
+	// if !nickRegexp.MatchString(u.Nick) {
+	// 	return errors.New("inválid nick format")
+	// }
 
 	if u.Email == "" {
 		return errors.New("email field is mandatory")

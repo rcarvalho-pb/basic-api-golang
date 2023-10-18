@@ -12,6 +12,7 @@ import (
 var (
 	ConnString = "%s:%s@/%s?charset=utf8&parseTime=True&loc=Local"
 	Port       = 0
+	Secret     = ""
 )
 
 func Load() {

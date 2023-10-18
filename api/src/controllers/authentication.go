@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"api/src/authentication"
 	"api/src/db"
 	"api/src/repositories"
 	"api/src/response"
@@ -48,9 +49,17 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.JSON(w, http.StatusAccepted, struct{
-		Login string
+	token, err := authentication.CreateToken(uint32(user.ID))
+	if err != nil {
+		response.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.JSON(w, http.StatusAccepted, struct {
+		Token  string `json:"token"`
+		UserId uint32 `json:"userId"`
 	}{
-		Login: "Logged sucessifully",
+		Token:  token,
+		UserId: uint32(user.ID),
 	})
 }
