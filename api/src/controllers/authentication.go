@@ -9,6 +9,9 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 type Auth struct {
@@ -62,4 +65,35 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Token:  token,
 		UserId: uint32(user.ID),
 	})
+}
+
+func FollowUser(w http.ResponseWriter, r *http.Request) {
+	id, err := authentication.ExtractUserId(r)
+	if err != nil {
+		response.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+
+	params := mux.Vars(r)
+	followedId, err := strconv.ParseUint(params["userId"], 10, 32)
+	if err != nil {
+		response.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	db, queries, err := db.Conn()
+	if err != nil {
+		response.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer db.Close()
+
+	repository := repositories.NewUserRepository(queries)
+
+	if err = repository.FollowUser(id, uint32(followedId)); err != nil {
+		response.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.JSON(w, http.StatusOK, nil)
 }

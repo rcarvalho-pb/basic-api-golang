@@ -78,6 +78,19 @@ func (q *Queries) FindUser(ctx context.Context, arg FindUserParams) ([]User, err
 	return items, nil
 }
 
+const followUser = `-- name: FollowUser :execresult
+insert ignore into followers (user_id, follower_id) values (?, ?)
+`
+
+type FollowUserParams struct {
+	UserID     int32
+	FollowerID int32
+}
+
+func (q *Queries) FollowUser(ctx context.Context, arg FollowUserParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, followUser, arg.UserID, arg.FollowerID)
+}
+
 const getUserByEmailOrNick = `-- name: GetUserByEmailOrNick :one
 select id, name, nick, email, password, created_at from users where email like ? or nick like ?
 `

@@ -18,9 +18,9 @@ func (u users) CreateUser(user database.User) (uint32, error) {
 	ctx := context.Background()
 
 	result, err := u.queries.CreateUser(ctx, database.CreateUserParams{
-		Name: user.Name,
-		Nick: user.Nick,
-		Email: user.Email,
+		Name:     user.Name,
+		Nick:     user.Nick,
+		Email:    user.Email,
 		Password: user.Password,
 	})
 	if err != nil {
@@ -59,14 +59,14 @@ func (u users) GetUserById(userId int32) (database.User, error) {
 	return user, nil
 }
 
-func (u users) UpdateUserById(userId uint32, user database.User) (error) {
+func (u users) UpdateUserById(userId uint32, user database.User) error {
 	ctx := context.Background()
 
 	err := u.queries.UpdateUserById(ctx, database.UpdateUserByIdParams{
-		ID: int32(userId),
-		Name: user.Name,
-		Nick: user.Nick,
-		Email: user.Email,
+		ID:       int32(userId),
+		Name:     user.Name,
+		Nick:     user.Nick,
+		Email:    user.Email,
 		Password: user.Password,
 	})
 	if err != nil {
@@ -91,11 +91,23 @@ func (u users) GetUserByEmailOrNick(emailOrNick string) (database.User, error) {
 
 	user, err := u.queries.GetUserByEmailOrNick(ctx, database.GetUserByEmailOrNickParams{
 		Email: emailOrNick,
-		Nick: emailOrNick,
+		Nick:  emailOrNick,
 	})
 	if err != nil {
 		return database.User{}, nil
 	}
 
 	return user, nil
+}
+
+func (u users) FollowUser(id, followedId uint32) error {
+	ctx := context.Background()
+	if _, err := u.queries.FollowUser(ctx, database.FollowUserParams{
+		UserID:     int32(id),
+		FollowerID: int32(followedId),
+	}); err != nil {
+		return err
+	}
+
+	return nil
 }

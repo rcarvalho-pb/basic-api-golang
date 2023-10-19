@@ -15,3 +15,6 @@ delete from users where id = ?;
 
 -- name: GetUserByEmailOrNick :one
 select * from users where email like ? or nick like ?;
+
+-- name: FollowUser :execresult
+insert ignore into followers (user_id, follower_id) values (?, ?);

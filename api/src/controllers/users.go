@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"api/db/database"
+	"api/src/authentication"
 	"api/src/db"
 	"api/src/repositories"
 	"api/src/response"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -109,6 +111,17 @@ func UpdateUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	id, err := authentication.ExtractUserId(r)
+	if err != nil {
+		response.ERROR(w, http.StatusBadGateway, err)
+		return
+	}
+
+	if id == uint32(userId) {
+		response.ERROR(w, http.StatusForbidden, errors.New("cant update different user"))
+		return
+	}
+
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
@@ -153,6 +166,17 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	id, err := authentication.ExtractUserId(r)
+	if err != nil {
+		response.ERROR(w, http.StatusBadGateway, err)
+		return
+	}
+
+	if id == uint32(userId) {
+		response.ERROR(w, http.StatusForbidden, errors.New("cant delete different user"))
+		return
+	}
+
 	sql, queries, err := db.Conn()
 	if err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
@@ -169,3 +193,5 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 
 	response.JSON(w, http.StatusNoContent, nil)
 }
+
+
