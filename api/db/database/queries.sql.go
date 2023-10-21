@@ -91,6 +91,74 @@ func (q *Queries) FollowUser(ctx context.Context, arg FollowUserParams) (sql.Res
 	return q.db.ExecContext(ctx, followUser, arg.UserID, arg.FollowerID)
 }
 
+const getAllUserFollow = `-- name: GetAllUserFollow :many
+select u.id, u.name, u.nick, u.email, u.created_at from users u
+inner join followers f on u.id = f.follower_id where f.user_id = ?
+`
+
+func (q *Queries) GetAllUserFollow(ctx context.Context, userID int32) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, getAllUserFollow, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Nick,
+			&i.Email,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllUserFollowed = `-- name: GetAllUserFollowed :many
+select u.id, u.name, u.nick, u.email, u.created_at from users u
+inner join followers f on u.id = f.user_id where f.follower_id = ?
+`
+
+func (q *Queries) GetAllUserFollowed(ctx context.Context, followerID int32) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, getAllUserFollowed, followerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Nick,
+			&i.Email,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUserByEmailOrNick = `-- name: GetUserByEmailOrNick :one
 select id, name, nick, email, password, created_at from users where email like ? or nick like ?
 `
@@ -130,6 +198,33 @@ func (q *Queries) GetUserById(ctx context.Context, id int32) (User, error) {
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const unfollowUser = `-- name: UnfollowUser :execresult
+delete from followers where user_id = ? and follower_id = ?
+`
+
+type UnfollowUserParams struct {
+	UserID     int32
+	FollowerID int32
+}
+
+func (q *Queries) UnfollowUser(ctx context.Context, arg UnfollowUserParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, unfollowUser, arg.UserID, arg.FollowerID)
+}
+
+const updatePassword = `-- name: UpdatePassword :exec
+update users set password = ? where id = ?
+`
+
+type UpdatePasswordParams struct {
+	Password string
+	ID       int32
+}
+
+func (q *Queries) UpdatePassword(ctx context.Context, arg UpdatePasswordParams) error {
+	_, err := q.db.ExecContext(ctx, updatePassword, arg.Password, arg.ID)
+	return err
 }
 
 const updateUserById = `-- name: UpdateUserById :exec

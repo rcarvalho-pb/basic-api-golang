@@ -18,3 +18,17 @@ select * from users where email like ? or nick like ?;
 
 -- name: FollowUser :execresult
 insert ignore into followers (user_id, follower_id) values (?, ?);
+
+-- name: UnfollowUser :execresult
+delete from followers where user_id = ? and follower_id = ?;
+
+-- name: GetAllUserFollow :many
+select u.id, u.name, u.nick, u.email, u.created_at from users u
+inner join followers f on u.id = f.follower_id where f.user_id = ?;
+
+-- name: GetAllUserFollowed :many
+select u.id, u.name, u.nick, u.email, u.created_at from users u
+inner join followers f on u.id = f.user_id where f.follower_id = ?;
+
+-- name: UpdatePassword :exec
+update users set password = ? where id = ?;

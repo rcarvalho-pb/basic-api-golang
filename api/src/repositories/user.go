@@ -111,3 +111,51 @@ func (u users) FollowUser(id, followedId uint32) error {
 
 	return nil
 }
+
+func (u users) UnfollowUser(id, unfollowedId uint32) error {
+	ctx := context.Background()
+
+	if _, err := u.queries.UnfollowUser(ctx, database.UnfollowUserParams{
+		UserID:     int32(id),
+		FollowerID: int32(unfollowedId),
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u users) GetUsersFollows(userId uint32) ([]database.User, error) {
+	ctx := context.Background()
+
+	users, err := u.queries.GetAllUserFollow(ctx, int32(userId))
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
+func (u users) GetUserFollowed(userId uint32) ([]database.User, error) {
+	ctx := context.Background()
+
+	users, err := u.queries.GetAllUserFollowed(ctx, int32(userId))
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
+func (u users) UpdatePassword(userId uint32, password string) error {
+	ctx := context.Background()
+
+	if err := u.queries.UpdatePassword(ctx, database.UpdatePasswordParams{
+		ID: int32(userId),
+		Password: password,
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
