@@ -12,6 +12,20 @@ import (
 	"strings"
 )
 
+type Follower struct {
+	UserID     int32
+	FollowerID int32
+}
+
+type Publication struct {
+	ID        int32
+	Title     sql.NullString
+	Content   sql.NullString
+	AuthorID  int32
+	Likes     sql.NullInt32
+	CreatedAt sql.NullTime
+}
+
 type User struct {
 	ID        int32 `json:"id,omitempty"`
 	Name      string `json:"name,omitempty"`
