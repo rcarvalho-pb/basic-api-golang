@@ -19,8 +19,8 @@ type Follower struct {
 
 type Publication struct {
 	ID        int32
-	Title     sql.NullString
-	Content   sql.NullString
+	Title     string
+	Content   string
 	AuthorID  int32
 	Likes     sql.NullInt32
 	CreatedAt sql.NullTime
