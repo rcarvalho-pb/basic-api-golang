@@ -1,8 +1,9 @@
 create database if not exists devbook;
 use devbook;
 
-drop table if exists users;
+drop table if exists publications;
 drop table if exists followers;
+drop table if exists users;
 
 create table users(
   id int auto_increment primary key,
@@ -25,4 +26,18 @@ create table followers(
   on delete cascade,
 
   primary key(user_id, follower_id)
+) engine=INNODB;
+
+create table publications(
+  id int auto_increment primary key,
+  title varchar(50) not null,
+  content varchar(300) not null,
+
+  author_id int not null,
+  foreign key(author_id)
+  references users(id)
+  on delete cascade,
+
+  likes int default 0,
+  created_at timestamp default current_timestamp
 ) engine=INNODB;
