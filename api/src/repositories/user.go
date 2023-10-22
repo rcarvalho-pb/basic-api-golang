@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"api/db/database"
+	"api/src/models"
 	"context"
 	"fmt"
 )
@@ -14,7 +15,7 @@ func NewUserRepository(queries *database.Queries) *users {
 	return &users{queries}
 }
 
-func (u users) CreateUser(user database.User) (uint32, error) {
+func (u users) CreateUser(user models.User) (uint32, error) {
 	ctx := context.Background()
 
 	result, err := u.queries.CreateUser(ctx, database.CreateUserParams{
@@ -59,7 +60,7 @@ func (u users) GetUserById(userId int32) (database.User, error) {
 	return user, nil
 }
 
-func (u users) UpdateUserById(userId uint32, user database.User) error {
+func (u users) UpdateUserById(userId uint32, user models.User) error {
 	ctx := context.Background()
 
 	err := u.queries.UpdateUserById(ctx, database.UpdateUserByIdParams{
@@ -125,7 +126,7 @@ func (u users) UnfollowUser(id, unfollowedId uint32) error {
 	return nil
 }
 
-func (u users) GetUsersFollows(userId uint32) ([]database.User, error) {
+func (u users) GetUsersFollows(userId uint32) ([]database.GetAllUserFollowRow, error) {
 	ctx := context.Background()
 
 	users, err := u.queries.GetAllUserFollow(ctx, int32(userId))
@@ -136,7 +137,7 @@ func (u users) GetUsersFollows(userId uint32) ([]database.User, error) {
 	return users, nil
 }
 
-func (u users) GetUserFollowed(userId uint32) ([]database.User, error) {
+func (u users) GetUserFollowed(userId uint32) ([]database.GetAllUserFollowedRow, error) {
 	ctx := context.Background()
 
 	users, err := u.queries.GetAllUserFollowed(ctx, int32(userId))

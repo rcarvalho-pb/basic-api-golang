@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"api/db/database"
 	"api/src/authentication"
 	"api/src/db"
+	"api/src/models"
 	"api/src/repositories"
 	"api/src/response"
 	"api/src/security"
@@ -24,14 +24,14 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var user database.User
+	var user models.User
 
 	if err = json.Unmarshal(requestBody, &user); err != nil {
 		response.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	if err = user.PrepareUser(database.NewUser); err != nil {
+	if err = user.PrepareUser(models.NewUser); err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -118,7 +118,7 @@ func UpdateUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if id == uint32(userId) {
+	if id != uint32(userId) {
 		response.ERROR(w, http.StatusForbidden, errors.New("cant update different user"))
 		return
 	}
@@ -129,14 +129,14 @@ func UpdateUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var user database.User
+	var user models.User
 
 	if err = json.Unmarshal(requestBody, &user); err != nil {
 		response.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	if err = user.PrepareUser(database.ModifyUser); err != nil {
+	if err = user.PrepareUser(models.ModifyUser); err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}

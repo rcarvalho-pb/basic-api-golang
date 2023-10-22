@@ -10,6 +10,26 @@ import (
 	"database/sql"
 )
 
+const createPublication = `-- name: CreatePublication :execresult
+insert into publications (title, content, author_id, likes) values (?, ?, ?, ?)
+`
+
+type CreatePublicationParams struct {
+	Title    string
+	Content  string
+	AuthorID int32
+	Likes    sql.NullInt32
+}
+
+func (q *Queries) CreatePublication(ctx context.Context, arg CreatePublicationParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, createPublication,
+		arg.Title,
+		arg.Content,
+		arg.AuthorID,
+		arg.Likes,
+	)
+}
+
 const createUser = `-- name: CreateUser :execresult
 insert into users(name, nick, email, password) values (?, ?, ?, ?)
 `
@@ -37,6 +57,24 @@ delete from users where id = ?
 func (q *Queries) DeleteUserById(ctx context.Context, id int32) error {
 	_, err := q.db.ExecContext(ctx, deleteUserById, id)
 	return err
+}
+
+const findPublicationById = `-- name: FindPublicationById :one
+select id, title, content, author_id, likes, created_at from publications where id = ?
+`
+
+func (q *Queries) FindPublicationById(ctx context.Context, id int32) (Publication, error) {
+	row := q.db.QueryRowContext(ctx, findPublicationById, id)
+	var i Publication
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Content,
+		&i.AuthorID,
+		&i.Likes,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const findUser = `-- name: FindUser :many
@@ -96,15 +134,23 @@ select u.id, u.name, u.nick, u.email, u.created_at from users u
 inner join followers f on u.id = f.follower_id where f.user_id = ?
 `
 
-func (q *Queries) GetAllUserFollow(ctx context.Context, userID int32) ([]User, error) {
+type GetAllUserFollowRow struct {
+	ID        int32
+	Name      string
+	Nick      string
+	Email     string
+	CreatedAt sql.NullTime
+}
+
+func (q *Queries) GetAllUserFollow(ctx context.Context, userID int32) ([]GetAllUserFollowRow, error) {
 	rows, err := q.db.QueryContext(ctx, getAllUserFollow, userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []User
+	var items []GetAllUserFollowRow
 	for rows.Next() {
-		var i User
+		var i GetAllUserFollowRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
@@ -130,15 +176,23 @@ select u.id, u.name, u.nick, u.email, u.created_at from users u
 inner join followers f on u.id = f.user_id where f.follower_id = ?
 `
 
-func (q *Queries) GetAllUserFollowed(ctx context.Context, followerID int32) ([]User, error) {
+type GetAllUserFollowedRow struct {
+	ID        int32
+	Name      string
+	Nick      string
+	Email     string
+	CreatedAt sql.NullTime
+}
+
+func (q *Queries) GetAllUserFollowed(ctx context.Context, followerID int32) ([]GetAllUserFollowedRow, error) {
 	rows, err := q.db.QueryContext(ctx, getAllUserFollowed, followerID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []User
+	var items []GetAllUserFollowedRow
 	for rows.Next() {
-		var i User
+		var i GetAllUserFollowedRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
