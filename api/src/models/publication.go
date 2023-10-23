@@ -6,10 +6,7 @@ import (
 	"strings"
 )
 
-type Publication struct{
-	database.Publication
-	AuthorNick string
-}
+type Publication database.Publication
 
 func (p *Publication) Prepare() error {
 

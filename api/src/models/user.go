@@ -8,9 +8,14 @@ import (
 	"strings"
 )
 
-type User struct {
-	database.User
-}
+// type User struct {
+// 	ID        int32        `json:"id,omitempty"`
+// 	Name      string       `json:"name,omitempty"`
+// 	Nick      string       `json:"nick,omitempty"`
+// 	Email     string       `json:"email,omitempty"`
+// 	Password  string       `json:"password,omitempty"`
+// 	CreatedAt sql.NullTime `json:"created_at,omitempty"`
+// }
 
 type Type uint32
 
@@ -18,6 +23,8 @@ const (
 	NewUser = iota
 	ModifyUser
 )
+
+type User database.User
 
 func (u *User) PrepareUser(stage Type) error {
 	if err := u.validateUser(stage); err != nil {
@@ -37,10 +44,10 @@ func (u *User) validateUser(stage Type) error {
 	if u.Nick == "" {
 		return errors.New("nick field is mandatory")
 	}
-	// nickRegexp := regexp.MustCompile(`^([\w\d\?\!\_\-\+])$`)
-	// if !nickRegexp.MatchString(u.Nick) {
-	// 	return errors.New("inválid nick format")
-	// }
+	nickRegexp := regexp.MustCompile(`^([\w\d\?\!\_\-\+]+)$`)
+	if !nickRegexp.MatchString(u.Nick) {
+		return errors.New("inválid nick format")
+	}
 
 	if u.Email == "" {
 		return errors.New("email field is mandatory")

@@ -49,7 +49,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := authentication.CreateToken(uint32(user.ID))
+	token, err := authentication.CreateToken(user.ID)
 	if err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
@@ -57,7 +57,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	response.JSON(w, http.StatusAccepted, struct {
 		Token  string `json:"token"`
-		UserId uint32 `json:"userId"`
+		UserId uint32 `json:"user_id"`
 	}{
 		Token:  token,
 		UserId: uint32(user.ID),

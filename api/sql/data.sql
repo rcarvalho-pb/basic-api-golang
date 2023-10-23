@@ -11,3 +11,8 @@ values
 (1, 2),
 (1, 3),
 (2, 3);
+
+insert into publications (title, content, author_id) values
+("publi do usuario 1", "publication from user 1", 1),
+("publi do usuario 2", "publication from user 2", 2),
+("publi do usuario 3", "publication from user 3", 3);

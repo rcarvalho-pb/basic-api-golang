@@ -37,4 +37,27 @@ update users set password = ? where id = ?;
 insert into publications (title, content, author_id, likes) values (?, ?, ?, ?);
 
 -- name: FindPublicationById :one
-select * from publications where id = ?;
+select p.*, u.nick from publications p inner join users u where p.id = ?;
+
+-- name: FindPublications :many
+select distinct p.*, u.nick from publications p inner join users u on u.id = p.author_id inner join followers f on p.author_id = f.user_id where u.id = ? or f.follower_id = ?;
+
+-- name: UpdatePublication :exec
+update publications set title = ?, content = ? where id = ?;
+
+-- name: DeletePublicationById :exec
+delete from publications where id = ?;
+
+-- name: GetUserPublications :many
+select p.*, u.nick from publications p inner join users u on u.id = p.author_id where author_id = ?;
+
+-- name: LikePublication :exec
+update publications set likes = likes + 1 where id = ?;
+
+-- name: DislikePublication :exec
+update publications set likes =
+case 
+  when likes > 0 then likes - 1
+  else likes
+end
+where id = ?;

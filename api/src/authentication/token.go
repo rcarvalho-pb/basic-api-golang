@@ -12,7 +12,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func CreateToken(userId uint32) (string, error) {
+func CreateToken(userId int32) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"authorized": true,
 		"exp":        time.Now().Add(time.Hour * 1).Unix(),
@@ -45,7 +45,7 @@ func getValidationKey(token *jwt.Token) (interface{}, error) {
 	return []byte(config.Secret), nil
 }
 
-func ExtractUserId(r *http.Request) (uint32, error) {
+func ExtractUserId(r *http.Request) (int64, error) {
 	tokenString := extractToken(r)
 
 	token, err := jwt.Parse(tokenString, getValidationKey)
@@ -59,7 +59,7 @@ func ExtractUserId(r *http.Request) (uint32, error) {
 			return 0, nil
 		}
 
-		return uint32(userId), nil
+		return int64(userId), nil
 	}
 
 	return 0, errors.New("invalid token")

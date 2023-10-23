@@ -50,6 +50,15 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (sql.Res
 	)
 }
 
+const deletePublicationById = `-- name: DeletePublicationById :exec
+delete from publications where id = ?
+`
+
+func (q *Queries) DeletePublicationById(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deletePublicationById, id)
+	return err
+}
+
 const deleteUserById = `-- name: DeleteUserById :exec
 delete from users where id = ?
 `
@@ -59,13 +68,37 @@ func (q *Queries) DeleteUserById(ctx context.Context, id int32) error {
 	return err
 }
 
-const findPublicationById = `-- name: FindPublicationById :one
-select id, title, content, author_id, likes, created_at from publications where id = ?
+const dislikePublication = `-- name: DislikePublication :exec
+update publications set likes =
+case 
+  when likes > 0 then likes - 1
+  else likes
+end
+where id = ?
 `
 
-func (q *Queries) FindPublicationById(ctx context.Context, id int32) (Publication, error) {
+func (q *Queries) DislikePublication(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, dislikePublication, id)
+	return err
+}
+
+const findPublicationById = `-- name: FindPublicationById :one
+select p.id, p.title, p.content, p.author_id, p.likes, p.created_at, u.nick from publications p inner join users u where p.id = ?
+`
+
+type FindPublicationByIdRow struct {
+	ID        int32
+	Title     string
+	Content   string
+	AuthorID  int32
+	Likes     sql.NullInt32
+	CreatedAt sql.NullTime
+	Nick      string
+}
+
+func (q *Queries) FindPublicationById(ctx context.Context, id int32) (FindPublicationByIdRow, error) {
 	row := q.db.QueryRowContext(ctx, findPublicationById, id)
-	var i Publication
+	var i FindPublicationByIdRow
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
@@ -73,8 +106,59 @@ func (q *Queries) FindPublicationById(ctx context.Context, id int32) (Publicatio
 		&i.AuthorID,
 		&i.Likes,
 		&i.CreatedAt,
+		&i.Nick,
 	)
 	return i, err
+}
+
+const findPublications = `-- name: FindPublications :many
+select distinct p.id, p.title, p.content, p.author_id, p.likes, p.created_at, u.nick from publications p inner join users u on u.id = p.author_id inner join followers f on p.author_id = f.user_id where u.id = ? or f.follower_id = ?
+`
+
+type FindPublicationsParams struct {
+	ID         int32
+	FollowerID int32
+}
+
+type FindPublicationsRow struct {
+	ID        int32
+	Title     string
+	Content   string
+	AuthorID  int32
+	Likes     sql.NullInt32
+	CreatedAt sql.NullTime
+	Nick      string
+}
+
+func (q *Queries) FindPublications(ctx context.Context, arg FindPublicationsParams) ([]FindPublicationsRow, error) {
+	rows, err := q.db.QueryContext(ctx, findPublications, arg.ID, arg.FollowerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindPublicationsRow
+	for rows.Next() {
+		var i FindPublicationsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Content,
+			&i.AuthorID,
+			&i.Likes,
+			&i.CreatedAt,
+			&i.Nick,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const findUser = `-- name: FindUser :many
@@ -254,6 +338,60 @@ func (q *Queries) GetUserById(ctx context.Context, id int32) (User, error) {
 	return i, err
 }
 
+const getUserPublications = `-- name: GetUserPublications :many
+select p.id, p.title, p.content, p.author_id, p.likes, p.created_at, u.nick from publications p inner join users u on u.id = p.author_id where author_id = ?
+`
+
+type GetUserPublicationsRow struct {
+	ID        int32
+	Title     string
+	Content   string
+	AuthorID  int32
+	Likes     sql.NullInt32
+	CreatedAt sql.NullTime
+	Nick      string
+}
+
+func (q *Queries) GetUserPublications(ctx context.Context, authorID int32) ([]GetUserPublicationsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getUserPublications, authorID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUserPublicationsRow
+	for rows.Next() {
+		var i GetUserPublicationsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Content,
+			&i.AuthorID,
+			&i.Likes,
+			&i.CreatedAt,
+			&i.Nick,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const likePublication = `-- name: LikePublication :exec
+update publications set likes = likes + 1 where id = ?
+`
+
+func (q *Queries) LikePublication(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, likePublication, id)
+	return err
+}
+
 const unfollowUser = `-- name: UnfollowUser :execresult
 delete from followers where user_id = ? and follower_id = ?
 `
@@ -278,6 +416,21 @@ type UpdatePasswordParams struct {
 
 func (q *Queries) UpdatePassword(ctx context.Context, arg UpdatePasswordParams) error {
 	_, err := q.db.ExecContext(ctx, updatePassword, arg.Password, arg.ID)
+	return err
+}
+
+const updatePublication = `-- name: UpdatePublication :exec
+update publications set title = ?, content = ? where id = ?
+`
+
+type UpdatePublicationParams struct {
+	Title   string
+	Content string
+	ID      int32
+}
+
+func (q *Queries) UpdatePublication(ctx context.Context, arg UpdatePublicationParams) error {
+	_, err := q.db.ExecContext(ctx, updatePublication, arg.Title, arg.Content, arg.ID)
 	return err
 }
 

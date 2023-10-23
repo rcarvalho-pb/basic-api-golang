@@ -79,7 +79,7 @@ func FindUser(w http.ResponseWriter, r *http.Request) {
 func GetUserById(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
-	userId, err := strconv.Atoi(params["userId"])
+	userId, err := strconv.ParseInt(params["userId"], 10, 64)
 	if err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
@@ -94,7 +94,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 
 	repository := repositories.NewUserRepository(queries)
 
-	user, err := repository.GetUserById(int32(userId))
+	user, err := repository.GetUserById(userId)
 	if err != nil {
 		response.ERROR(w, http.StatusNotFound, err)
 		return
@@ -106,7 +106,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 func UpdateUserById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
-	userId, err := strconv.ParseUint(params["userId"], 10, 32)
+	userId, err := strconv.ParseInt(params["userId"], 10, 32)
 	if err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
@@ -118,7 +118,7 @@ func UpdateUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if id != uint32(userId) {
+	if id != userId {
 		response.ERROR(w, http.StatusForbidden, errors.New("cant update different user"))
 		return
 	}
@@ -150,7 +150,7 @@ func UpdateUserById(w http.ResponseWriter, r *http.Request) {
 
 	repository := repositories.NewUserRepository(queries)
 
-	if err = repository.UpdateUserById(uint32(userId), user); err != nil {
+	if err = repository.UpdateUserById(userId, user); err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -161,7 +161,7 @@ func UpdateUserById(w http.ResponseWriter, r *http.Request) {
 func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
-	userId, err := strconv.ParseUint(params["userId"], 10, 32)
+	userId, err := strconv.ParseInt(params["userId"], 10, 32)
 	if err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
@@ -173,7 +173,7 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if id == uint32(userId) {
+	if id == userId {
 		response.ERROR(w, http.StatusForbidden, errors.New("cant delete different user"))
 		return
 	}
@@ -187,7 +187,7 @@ func DeleteUserById(w http.ResponseWriter, r *http.Request) {
 
 	repository := repositories.NewUserRepository(queries)
 
-	if err = repository.DeleteUserById(uint32(userId)); err != nil {
+	if err = repository.DeleteUserById(userId); err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -203,13 +203,13 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := mux.Vars(r)
-	followedId, err := strconv.ParseUint(params["userId"], 10, 32)
+	followedId, err := strconv.ParseInt(params["userId"], 10, 32)
 	if err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	if id == uint32(followedId) {
+	if id == followedId {
 		response.ERROR(w, http.StatusForbidden, errors.New("cant follow yourself"))
 		return
 	}
@@ -223,7 +223,7 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 
 	repository := repositories.NewUserRepository(queries)
 
-	if err = repository.FollowUser(id, uint32(followedId)); err != nil {
+	if err = repository.FollowUser(id, followedId); err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -239,13 +239,13 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := mux.Vars(r)
-	followedId, err := strconv.ParseUint(params["userId"], 10, 32)
+	followedId, err := strconv.ParseInt(params["userId"], 10, 32)
 	if err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	if id == uint32(followedId) {
+	if id == followedId {
 		response.ERROR(w, http.StatusForbidden, errors.New("cant unfollow yourself"))
 		return
 	}
@@ -259,7 +259,7 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 
 	repository := repositories.NewUserRepository(queries)
 
-	if err = repository.UnfollowUser(id, uint32(followedId)); err != nil {
+	if err = repository.UnfollowUser(id, followedId); err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -270,7 +270,7 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 func UserFollowers(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
-	userId, err := strconv.ParseUint(params["userId"], 10, 32)
+	userId, err := strconv.ParseInt(params["userId"], 10, 32)
 	if err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
@@ -285,7 +285,7 @@ func UserFollowers(w http.ResponseWriter, r *http.Request) {
 
 	repository := repositories.NewUserRepository(queries)
 
-	users, err := repository.GetUsersFollows(uint32(userId))
+	users, err := repository.GetUsersFollows(userId)
 	if err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
@@ -297,7 +297,7 @@ func UserFollowers(w http.ResponseWriter, r *http.Request) {
 func UserFollowed(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
-	userId, err := strconv.ParseUint(params["userId"], 10, 32)
+	userId, err := strconv.ParseInt(params["userId"], 10, 32)
 	if err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
@@ -312,7 +312,7 @@ func UserFollowed(w http.ResponseWriter, r *http.Request) {
 
 	repository := repositories.NewUserRepository(queries)
 
-	users, err := repository.GetUserFollowed(uint32(userId))
+	users, err := repository.GetUserFollowed(userId)
 	if err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
@@ -329,13 +329,13 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := mux.Vars(r)
-	userId, err := strconv.ParseUint(params["userId"], 10, 32)
+	userId, err := strconv.ParseInt(params["userId"], 10, 32)
 	if err != nil {
 		response.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
 
-	if userId != uint64(id) {
+	if userId != id {
 		response.ERROR(w, http.StatusForbidden, errors.New("cant update another users password"))
 		return
 	}
@@ -365,7 +365,7 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 
 	repository := repositories.NewUserRepository(queries)
 
-	user, err := repository.GetUserById(int32(userId))
+	user, err := repository.GetUserById(userId)
 	if err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
@@ -381,7 +381,7 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 		response.ERROR(w, http.StatusInternalServerError, err)
 	}
 
-	if err = repository.UpdatePassword(uint32(userId), string(hashedPassword)); err != nil {
+	if err = repository.UpdatePassword(userId, string(hashedPassword)); err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
