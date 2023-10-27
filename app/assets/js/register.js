@@ -19,7 +19,9 @@ function createUser(event){
     }
   }).done(function() {
     alert("Usuário cadastrado com sucesso")
-  }).fail(function() {
+    window.location = "/"
+  }).fail(function(err) {
+    console.log(err)
     alert("Erro ao cadastrar usuário")
   })
 }

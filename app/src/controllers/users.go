@@ -3,7 +3,10 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
+	"webapp/src/config"
 	"webapp/src/response"
 )
 
@@ -17,14 +20,19 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		"Password": r.FormValue("Password"),
 	})
 	if err != nil {
-		response.ERROR(w, http.StatusInternalServerError, err)
+		log.Fatal(err)
 	}
 
-	res, err := http.Post("http://localhost:5000/users", "application/json", bytes.NewBuffer(user))
+	res, err := http.Post(fmt.Sprintf("%s/users", config.ApiUrl), "application/json", bytes.NewBuffer(user))
 	if err != nil {
-		response.ERROR(w, http.StatusBadRequest, err)
+		response.JSON(w, http.StatusInternalServerError, response.APIError{Error: err.Error()})
 	}
 	defer res.Body.Close()
+	
+	if res.StatusCode >= 400 {
+		response.StatusCodeErrorTreatment(w, res)
+		return
+	}
 
 	response.JSON(w, res.StatusCode, nil)
 }
