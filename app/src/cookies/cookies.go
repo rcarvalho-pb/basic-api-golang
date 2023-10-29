@@ -40,7 +40,7 @@ func Read(r *http.Request) (map[string]string, error) {
 		return nil, err
 	}
 
-	values := make(map[string]string)
+	var values map[string]string
 
 	if err = s.Decode("data", cookie.Value, &values); err != nil {
 		return nil, err

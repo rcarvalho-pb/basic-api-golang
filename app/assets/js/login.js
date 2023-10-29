@@ -12,7 +12,7 @@ function login(event) {
     }
   }).done(function() {
     alert("Sucesso ao logar")
-    window.location = "/huome"
+    window.location = "/home"
   }).fail(function() {
     alert("Usuário inválido")
   });

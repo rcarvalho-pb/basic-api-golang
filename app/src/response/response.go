@@ -20,10 +20,10 @@ func JSON(w http.ResponseWriter, statusCode int, data interface{}) {
 }
 
 func StatusCodeErrorTreatment(w http.ResponseWriter, r *http.Response) {
-	var err APIError
+	var apiError APIError
 
-	if err := json.NewDecoder(r.Body).Decode(&err); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&apiError); err != nil {
 		log.Fatal(err)
 	}
-	JSON(w, r.StatusCode, err)
+	JSON(w, r.StatusCode, apiError)
 }

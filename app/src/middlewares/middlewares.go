@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"webapp/src/cookies"
@@ -16,11 +15,11 @@ func Logger(next http.HandlerFunc) http.HandlerFunc {
 
 func Authenticate(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		if _, err := cookies.Read(r); err != nil {
-			fmt.Println("Error reading cookies")
+			http.Redirect(w, r, "/login", http.StatusPermanentRedirect)
 			return
 		}
-
 		next(w, r)
 	}
 }

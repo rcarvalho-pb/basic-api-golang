@@ -6,8 +6,8 @@ import (
 )
 
 var HomeRoute = Route{
-	Uri: "/huome",
+	Uri: "/home",
 	Method: http.MethodGet,
 	Function: controllers.LoadHome,
-	Authentication: false,
+	Authentication: true,
 }

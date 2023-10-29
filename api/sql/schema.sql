@@ -11,7 +11,7 @@ create table users(
   nick varchar(255) not null unique,
   email varchar(255) not null unique,
   password varchar(255) not null,
-  created_at timestamp default current_timestamp()
+  created_at timestamp default current_timestamp
 ) engine = INNODB;
 
 create table followers(

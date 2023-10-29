@@ -23,9 +23,9 @@ func Config(router *mux.Router) {
 	for _, route := range routes {
 		if route.Authentication {
 			router.HandleFunc(route.Uri, middlewares.Logger(middlewares.Authenticate(route.Function))).Methods(route.Method)
+		} else {
+			router.HandleFunc(route.Uri, middlewares.Logger(route.Function)).Methods(route.Method)
 		}
-		router.HandleFunc(route.Uri, middlewares.Logger(route.Function)).Methods(route.Method)
-		// router.HandleFunc(route.Uri, route.Function).Methods(route.Method)
 	}
 
 	fileServe := http.FileServer(http.Dir("./assets/"))
