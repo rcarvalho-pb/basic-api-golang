@@ -35,9 +35,9 @@ func LoadHome(w http.ResponseWriter, r *http.Request) {
 
 	var publications []models.Publication
 	if err = json.NewDecoder(res.Body).Decode(&publications); err != nil {
-		fmt.Println(publications)
 		response.JSON(w, http.StatusUnprocessableEntity, response.APIError{Error: err.Error()})
 		return
 	}
-	utils.ExecuteTemplate(w, "home.html", nil)
+	
+	utils.ExecuteTemplate(w, "home.html", publications)
 }
