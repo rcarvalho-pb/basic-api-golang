@@ -34,7 +34,7 @@ inner join followers f on u.id = f.user_id where f.follower_id = ?;
 update users set password = ? where id = ?;
 
 -- name: CreatePublication :execresult
-insert into publications (title, content, author_id, likes) values (?, ?, ?, ?);
+insert into publications (title, content, author_id) values (?, ?, ?);
 
 -- name: FindPublicationById :one
 select p.*, u.nick from publications p inner join users u where p.id = ?;

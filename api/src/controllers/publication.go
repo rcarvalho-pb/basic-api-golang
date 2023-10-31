@@ -35,27 +35,27 @@ func CreatePublication(w http.ResponseWriter, r *http.Request) {
 	}
 
 	publication.AuthorID = int32(author_id)
-	
+
 	db, queries, err := db.Conn()
 	if err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
 	defer db.Close()
-	
+
 	publicationRepository := repositories.NewPublicationRepository(queries)
 
 	if err = publication.Prepare(); err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
-	
+
 	publicationId, err := publicationRepository.CreatePublication(publication)
 	if err != nil {
 		response.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
-	
+
 	publication.ID = int32(publicationId)
 
 	response.JSON(w, http.StatusCreated, publication)
@@ -142,7 +142,7 @@ func UpdatePublication(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if userId != int64(publication.ID) {
+	if userId != int64(publication.AuthorID) {
 		response.ERROR(w, http.StatusForbidden, errors.New("cant update other person publication"))
 		return
 	}

@@ -2,6 +2,7 @@ package response
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -10,7 +11,7 @@ func JSON(w http.ResponseWriter, statusCode int, data interface{}) {
 
 	if data != nil {
 		if err := json.NewEncoder(w).Encode(data); err != nil {
-			ERROR(w, statusCode, err)
+			log.Fatal(err)
 		}
 	}
 }

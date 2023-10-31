@@ -1,3 +1,5 @@
+const USER_RESOURCE = "/users"
+
 $('#register-user').on('submit', createUser)
 
 function createUser(event){
@@ -9,7 +11,7 @@ function createUser(event){
   }
 
   $.ajax({
-    url: "/users",
+    url: USER_RESOURCE,
     method: "POST",
     data: {
       Name: $('#name').val(),

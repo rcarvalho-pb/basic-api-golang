@@ -11,6 +11,8 @@ import (
 	"webapp/src/request"
 	"webapp/src/response"
 	"webapp/src/utils"
+
+	"github.com/gorilla/mux"
 )
 
 func LoadLoginPage(w http.ResponseWriter, _ *http.Request) {
@@ -51,4 +53,37 @@ func LoadHome(w http.ResponseWriter, r *http.Request) {
 		Publications: publications,
 		UserID:       int32(userId),
 	})
+}
+
+func LoadUpdatePublicationPage(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	publicationId, err := strconv.ParseInt(params["publicationId"], 10, 32)
+	if err != nil {
+		response.JSON(w, http.StatusBadRequest, response.APIError{Error: err.Error()})
+		return
+	}
+
+	url := fmt.Sprintf("%s/publications/%d", config.ApiUrl, publicationId)
+
+	res, err := request.Request(r, http.MethodGet, url, nil)
+	if err != nil {
+		response.JSON(w, http.StatusBadRequest, err)
+		return
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode >= 400 {
+		response.StatusCodeErrorTreatment(w, res)
+		return
+	}
+
+	var publication models.Publication
+
+	if err = json.NewDecoder(res.Body).Decode(&publication); err != nil {
+		response.JSON(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	utils.ExecuteTemplate(w, "update-publication.html", publication)
 }

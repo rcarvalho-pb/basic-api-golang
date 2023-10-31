@@ -18,10 +18,9 @@ func (p publications) CreatePublication(publication models.Publication) (int64, 
 	ctx := context.Background()
 
 	result, err := p.queries.CreatePublication(ctx, database.CreatePublicationParams{
-		Title: publication.Title,
-		Content: publication.Content,
+		Title:    publication.Title,
+		Content:  publication.Content,
 		AuthorID: publication.AuthorID,
-		Likes: publication.Likes,
 	})
 	if err != nil {
 		return 0, nil
@@ -39,7 +38,7 @@ func (p publications) FindPublications(userId int64) ([]database.FindPublication
 	ctx := context.Background()
 
 	publications, err := p.queries.FindPublications(ctx, database.FindPublicationsParams{
-		ID: int32(userId),
+		ID:         int32(userId),
 		FollowerID: int32(userId),
 	})
 	if err != nil {
@@ -49,7 +48,7 @@ func (p publications) FindPublications(userId int64) ([]database.FindPublication
 	return publications, nil
 }
 
-func (p publications) FindPublicationById(id int64) (database.FindPublicationByIdRow, error){
+func (p publications) FindPublicationById(id int64) (database.FindPublicationByIdRow, error) {
 	ctx := context.Background()
 
 	publication, err := p.queries.FindPublicationById(ctx, int32(id))
@@ -64,8 +63,8 @@ func (p publications) UpdatePublication(publicationId int64, publication models.
 	ctx := context.Background()
 
 	if err := p.queries.UpdatePublication(ctx, database.UpdatePublicationParams{
-		ID: int32(publicationId),
-		Title: publication.Title,
+		ID:      int32(publicationId),
+		Title:   publication.Title,
 		Content: publication.Content,
 	}); err != nil {
 		return err
