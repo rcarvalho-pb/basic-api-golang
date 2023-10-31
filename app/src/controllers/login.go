@@ -3,7 +3,7 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 	"webapp/src/cookies"
 	"webapp/src/models"
@@ -37,16 +37,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	var auth models.AuthDTO
 
 	if err = json.NewDecoder(res.Body).Decode(&auth); err != nil {
-		log.Println("Aqui")
-		log.Println(auth)
 		response.JSON(w, http.StatusUnprocessableEntity, response.APIError{Error: err.Error()})
 		return
 	}
 
-	if err = cookies.Save(w, auth.ID, auth.Token); err != nil {
+	if err = cookies.Save(w, fmt.Sprintf("%d",auth.ID), auth.Token); err != nil {
 		response.JSON(w, http.StatusUnprocessableEntity, response.APIError{Error: err.Error()})
 		return
 	}
-
+	
 	response.JSON(w, http.StatusOK, nil)
 }

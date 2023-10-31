@@ -19,13 +19,13 @@ func Save(w http.ResponseWriter, id, token string) error {
 		"token": token,
 	}
 
-	encodedData, err := s.Encode("data", data)
+	encodedData, err := s.Encode("devbook-data", data)
 	if err != nil {
 		return err
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     "data",
+		Name:     "devbook-data",
 		Value:    encodedData,
 		Path:     "/",
 		HttpOnly: true,
@@ -35,14 +35,14 @@ func Save(w http.ResponseWriter, id, token string) error {
 }
 
 func Read(r *http.Request) (map[string]string, error) {
-	cookie, err := r.Cookie("data")
+	cookie, err := r.Cookie("devbook-data")
 	if err != nil {
 		return nil, err
 	}
 
 	var values map[string]string
 
-	if err = s.Decode("data", cookie.Value, &values); err != nil {
+	if err = s.Decode("devbook-data", cookie.Value, &values); err != nil {
 		return nil, err
 	}
 

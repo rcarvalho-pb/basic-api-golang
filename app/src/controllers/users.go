@@ -26,6 +26,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	res, err := http.Post(fmt.Sprintf("%s/users", config.ApiUrl), "application/json", bytes.NewBuffer(user))
 	if err != nil {
 		response.JSON(w, http.StatusInternalServerError, response.APIError{Error: err.Error()})
+		return
 	}
 	defer res.Body.Close()
 	

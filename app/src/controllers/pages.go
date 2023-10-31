@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"webapp/src/config"
+	"webapp/src/cookies"
 	"webapp/src/models"
 	"webapp/src/request"
 	"webapp/src/response"
@@ -38,6 +40,15 @@ func LoadHome(w http.ResponseWriter, r *http.Request) {
 		response.JSON(w, http.StatusUnprocessableEntity, response.APIError{Error: err.Error()})
 		return
 	}
-	
-	utils.ExecuteTemplate(w, "home.html", publications)
+
+	cookie, _ := cookies.Read(r)
+	userId, _ := strconv.ParseInt(cookie["id"], 10, 32)
+
+	utils.ExecuteTemplate(w, "home.html", struct {
+		Publications []models.Publication
+		UserID       int32
+	}{
+		Publications: publications,
+		UserID:       int32(userId),
+	})
 }

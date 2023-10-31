@@ -5,9 +5,11 @@ import (
 	"webapp/src/controllers"
 )
 
-var HomeRoute = Route{
-	Uri: "/home",
-	Method: http.MethodGet,
-	Function: controllers.LoadHome,
-	Authentication: true,
+var HomeRoute = []Route{
+	{
+		Uri: "/home",
+		Method: http.MethodGet,
+		Function: controllers.LoadHome,
+		Authentication: true,
+	},
 }

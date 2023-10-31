@@ -1,0 +1,40 @@
+{{ define "curtidas" }}
+  <i class="fas fa-heart like-publication" id="{{ .ID }}"></i>
+  <span> {{ .Likes.Int32 }} </span>
+  {{ end }}
+  
+  {{ define "editar" }}
+  <a href="/edit-publication" style="text-decoration: none;"><i class="fas fa-edit"></i></a>
+  {{ end }}
+  
+  {{ define "deletar" }}
+  <a href="/delete-publication" style="text-decoration: none;"><i class="fas fa-trash text-danger"></i></a>
+{{ end }}
+
+
+{{ define "cabecalho-publicacao" }}
+  <h1 class="display-4">{{ .Title}}</h1>
+  <p class="lead">{{ .Content }}</p>
+  <a href="#">{{ .Nick }} - {{ .CreatedAt.Time.Format "2/1/2006" }}</a>
+  <hr class="my-4">
+{{ end }}
+
+{{ define "publicacao-com-permissao" }}
+  <div class="bg-light p-5 rounded-lg m-3" id="{{ .ID }}">
+    {{ template "cabecalho-publicacao" . }}
+    <p>
+      {{ template "curtidas" . }}
+      {{ template "editar" }}
+      {{ template "deletar" }}
+    </p>
+  </div>
+  {{ end }}
+  
+  {{ define "publicacao-sem-permissao" }}
+  <div class="bg-light p-5 rounded-lg m-3" id="{{ .ID }}">
+    {{ template "cabecalho-publicacao" . }}
+    <p>
+      {{ template "curtidas" . }}
+    </p>
+  </div>
+{{ end }}

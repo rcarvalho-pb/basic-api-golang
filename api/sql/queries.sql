@@ -40,7 +40,7 @@ insert into publications (title, content, author_id, likes) values (?, ?, ?, ?);
 select p.*, u.nick from publications p inner join users u where p.id = ?;
 
 -- name: FindPublications :many
-select distinct p.*, u.nick from publications p inner join users u on u.id = p.author_id inner join followers f on p.author_id = f.user_id where u.id = ? or f.follower_id = ?;
+select distinct p.*, u.nick from publications p inner join users u on u.id = p.author_id inner join followers f on p.author_id = f.user_id where u.id = ? or f.follower_id = ? order by 1 desc;
 
 -- name: UpdatePublication :exec
 update publications set title = ?, content = ? where id = ?;

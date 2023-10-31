@@ -112,7 +112,7 @@ func (q *Queries) FindPublicationById(ctx context.Context, id int32) (FindPublic
 }
 
 const findPublications = `-- name: FindPublications :many
-select distinct p.id, p.title, p.content, p.author_id, p.likes, p.created_at, u.nick from publications p inner join users u on u.id = p.author_id inner join followers f on p.author_id = f.user_id where u.id = ? or f.follower_id = ?
+select distinct p.id, p.title, p.content, p.author_id, p.likes, p.created_at, u.nick from publications p inner join users u on u.id = p.author_id inner join followers f on p.author_id = f.user_id where u.id = ? or f.follower_id = ? order by 1 desc
 `
 
 type FindPublicationsParams struct {
