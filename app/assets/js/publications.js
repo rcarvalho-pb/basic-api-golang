@@ -97,9 +97,19 @@ function updatePublication() {
       content: $('#content').val()
     }
   }).done(function() {
-    alert("publicação editada com sucesso")
+    Swal.fire({
+      icon: 'success',
+      title: 'Atualização realizada com sucesso',
+      showConfirmButton: false,
+      timer: 1500
+    })
   }).fail(function() {
-    alert("erro ao editar publicação")
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro ao realizar atualização da publicação',
+      showConfirmButton: false,
+      timer: 1500
+    })
   }).always(
     $("#update-publication").prop("disable", false)
   )
@@ -115,14 +125,55 @@ function deletePublication(event) {
 
   element.prop('disable', true)
 
-  $.ajax({
-    url: `${PUBLICATION_RESOURCE}/${publicationId}`,
-    method: "DELETE",
-  }).done(function() {
-    publication.fadeOut("slow", function() {
-      $(this).remove()
-    })
-  }).fail(function() {
-    alert("Erro ao excluir publicacao")
+   
+  const swalWithBootstrapButtons = Swal.mixin({
+    customClass: {
+      confirmButton: 'btn btn-success',
+      cancelButton: 'btn btn-danger'
+    },
+    buttonsStyling: false
+  })
+  
+  swalWithBootstrapButtons.fire({
+    title: 'Tem certeza que deseja deletar?',
+    text: "Não é possível desfazer após confirmar",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'No, cancel!',
+    reverseButtons: true
+  }).then((result) => {
+    if (result.isConfirmed) {
+      
+      $.ajax({
+        url: `${PUBLICATION_RESOURCE}/${publicationId}`,
+        method: "DELETE",
+      }).done(function() {
+        swalWithBootstrapButtons.fire(
+          'Deleted!',
+          'Your file has been deleted.',
+          'success'
+        )
+        publication.fadeOut("slow", function() {
+          $(this).remove()
+        })
+      }).fail(function() {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao excluir a publicação',
+          showConfirmButton: false,
+          timer: 1500
+        })
+      })
+    } else if (
+      /* Read more about handling dismissals below */
+      result.dismiss === Swal.DismissReason.cancel
+    ) {
+      swalWithBootstrapButtons.fire(
+        'Cancelled',
+        'Your imaginary file is safe :)',
+        'error'
+      )
+    }
   })
 }
