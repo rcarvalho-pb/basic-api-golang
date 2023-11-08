@@ -52,13 +52,13 @@ var UserRoutes = []Route{
 	},
 	{
 		Uri:                   USER_RESOURCE + "/{userId}/followers",
-		Method:                http.MethodPost,
+		Method:                http.MethodGet,
 		Function:              controllers.UserFollowers,
 		RequireAuthentication: true,
 	},
 	{
 		Uri:                   USER_RESOURCE + "/{userId}/followed",
-		Method:                http.MethodPost,
+		Method:                http.MethodGet,
 		Function:              controllers.UserFollowed,
 		RequireAuthentication: true,
 	},

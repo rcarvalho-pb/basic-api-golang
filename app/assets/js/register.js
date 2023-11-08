@@ -20,10 +20,33 @@ function createUser(event){
       Password: $('#password').val()
     }
   }).done(function() {
-    alert("Usuário cadastrado com sucesso")
-    window.location = "/"
+    Swal.fire(
+      'Sucesso!',
+      'Usuário registrado com sucesso',
+      'success',
+    ).then(function() {
+      $.ajax({
+        url: "/login",
+        method: "POST",
+        data: {
+          email: $('#email').val(),
+          password: $("#password").val()
+        }
+      }).done(function() {
+        window.location = '/home'
+      }).fail(function() {
+        Swal.fire(
+          'Ops...!',
+          'Erro ao autenticar usuário',
+          'error',
+        )
+      })
+    })
   }).fail(function(err) {
-    console.log(err)
-    alert("Erro ao cadastrar usuário")
+    Swal.fire(
+      'Ops...!',
+      'Erro ao registrar Usuário',
+      'error',
+    )
   })
 }

@@ -2,7 +2,7 @@
 insert into users(name, nick, email, password) values (?, ?, ?, ?);
 
 -- name: FindUser :many
-select * from users where name like ? or nick like ?;
+select id ,name, nick, email, created_at from users where name like ? or nick like ?;
 
 -- name: GetUserById :one
 select * from users where id = ?;

@@ -2,25 +2,14 @@ package models
 
 import (
 	"database/sql"
-	"time"
 )
 
-type Time struct {
-	Time  time.Time
-	Valid bool
-}
-
-type Like struct {
-	Int32 int32
-	Valid bool
-}
-
 type Publication struct {
-	ID        int32
-	Title     string
-	Content   string
-	AuthorID  uint64
-	Nick      string
-	Likes     sql.NullInt32
-	CreatedAt sql.NullTime
+	ID        int32 `json:"ID,omitempty"`
+	Title     string `json:"Title,omitempty"`
+	Content   string `json:"Content,omitempty"`
+	AuthorID  uint64 `json:"AuthorID,omitempty"`
+	Nick      string `json:"Nick,omitempty"`
+	Likes     sql.NullInt32 `json:"Likes,omitempty"`
+	CreatedAt sql.NullTime `json:"CreatedAt,omitempty"`
 }

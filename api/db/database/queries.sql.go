@@ -156,7 +156,7 @@ func (q *Queries) FindPublications(ctx context.Context, arg FindPublicationsPara
 }
 
 const findUser = `-- name: FindUser :many
-select id, name, nick, email, password, created_at from users where name like ? or nick like ?
+select id ,name, nick, email, created_at from users where name like ? or nick like ?
 `
 
 type FindUserParams struct {
@@ -164,21 +164,28 @@ type FindUserParams struct {
 	Nick string
 }
 
-func (q *Queries) FindUser(ctx context.Context, arg FindUserParams) ([]User, error) {
+type FindUserRow struct {
+	ID        int32
+	Name      string
+	Nick      string
+	Email     string
+	CreatedAt sql.NullTime
+}
+
+func (q *Queries) FindUser(ctx context.Context, arg FindUserParams) ([]FindUserRow, error) {
 	rows, err := q.db.QueryContext(ctx, findUser, arg.Name, arg.Nick)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []User
+	var items []FindUserRow
 	for rows.Next() {
-		var i User
+		var i FindUserRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
 			&i.Nick,
 			&i.Email,
-			&i.Password,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err

@@ -49,7 +49,13 @@ func (u users) FindUser(nameOrNick string) ([]models.User, error) {
 	var res []models.User
 
 	for _, user := range users {
-		res = append(res, models.User(user))
+		res = append(res, models.User{
+			ID: user.ID,
+			Name: user.Name,
+			Nick: user.Nick,
+			Email: user.Email,
+			CreatedAt: user.CreatedAt,
+		})
 	}
 
 	return res, nil

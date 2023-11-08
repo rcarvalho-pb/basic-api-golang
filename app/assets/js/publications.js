@@ -19,7 +19,11 @@ function createPublication(event) {
   }).done(function() {
     window.location = "/home"
   }).fail(function() {
-    alert("Erro ao criar publicação!")
+    Swal.fire(
+      'Sucesso!',
+      'Erro ao criar publicação!',
+      'error',
+    )
   })
 }
 
@@ -46,8 +50,11 @@ function likePublication(event) {
     element.removeClass('like-publication')
 
   }).fail(function (err){
-    console.log(err)
-    alert("Erro ao curtir publicacao")
+    Swal.fire(
+      'Sucesso!',
+      'Erro ao curtir publicação!',
+      'error',
+    )
   }).always(function() {
     element.prop('disable', false)
   })
@@ -76,8 +83,11 @@ function dislikePublication(event) {
     element.addClass('like-publication')
 
   }).fail(function (err){
-    console.log(err)
-    alert("Erro ao descurtir publicacao")
+    Swal.fire(
+      'Sucesso!',
+      'Erro ao descurtir publicacao!',
+      'error',
+    )
   }).always(function() {
     element.prop('disable', false)
   })
@@ -97,11 +107,12 @@ function updatePublication() {
       content: $('#content').val()
     }
   }).done(function() {
-    Swal.fire({
-      icon: 'success',
-      title: 'Atualização realizada com sucesso',
-      showConfirmButton: false,
-      timer: 1500
+    Swal.fire(
+      'Sucesso!',
+      'Atualização realizada com sucesso',
+      'success',
+    ).then(function() {
+      window.location = '/home'
     })
   }).fail(function() {
     Swal.fire({
@@ -134,24 +145,22 @@ function deletePublication(event) {
     buttonsStyling: false
   })
   
-  swalWithBootstrapButtons.fire({
+  Swal.fire({
     title: 'Tem certeza que deseja deletar?',
     text: "Não é possível desfazer após confirmar",
     icon: 'warning',
     showCancelButton: true,
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'No, cancel!',
-    reverseButtons: true
+    cancelButtonText: 'Não, cancelar!',
+    confirmButtonText: 'Deletar!'
   }).then((result) => {
     if (result.isConfirmed) {
-      
       $.ajax({
         url: `${PUBLICATION_RESOURCE}/${publicationId}`,
         method: "DELETE",
       }).done(function() {
         swalWithBootstrapButtons.fire(
-          'Deleted!',
-          'Your file has been deleted.',
+          'Deleteda!',
+          'Sua publicação foi deletada.',
           'success'
         )
         publication.fadeOut("slow", function() {

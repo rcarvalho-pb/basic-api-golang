@@ -11,9 +11,8 @@ function login(event) {
       password: $("#password").val()
     }
   }).done(function() {
-    alert("Sucesso ao logar")
-    window.location = "/home"
+      window.location = '/home'
   }).fail(function() {
-    alert("Usuário inválido")
+    Swal.fire('Erro ao realizar Login!','fail')
   });
 }
