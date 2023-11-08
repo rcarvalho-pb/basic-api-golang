@@ -5,10 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/assets/css/bootstrap.css">
   {{ template "scripts" }}
+  <script src="/assets/js/publications.js" defer></script>
   <title>Devbook - {{ .User.Name }}</title>
 </head>
 <body>
   {{ template "cabecalho" }}
+
+  {{ $IsFollowedByUser := false }}
+  {{ range .User.Followers }}
+    {{ if (eq .ID $.LoggedUserId)}}
+      {{ $IsFollowedByUser = true}}
+    {{ end }}
+  {{ end }}
 
   <div class="conteinar-fluid">
     <div class="row mt-4">
@@ -23,11 +31,34 @@
             <p class="card-text"><a href="#">Seguidores: {{ len .User.Followers }}</a></p>
 
             <p class="card-text"><a href="#">Seguindo: {{ len .User.Follows }}</a></p>
+            <a href="#" class="card-link">
+              {{ if $IsFollowedByUser }}
+                <button id="parar-de-seguir" class="btn btn-info">Parar de Seguir</button>
+              {{ else }}
+                <button id="seguir" class="btn btn-info">Seguir</button></a>
+              {{ end }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Publicação de {{ .User.Nick }}</h5>
+            <p class="card-text">
+              {{ range .User.Publications }}
+                {{ template "publicacao-sem-permissao" .}}
+              {{ else }}
+                <p class="text-muted">Sem Publicações por enquanto...</p>
+              {{ end }}
+            </p>
           </div>
         </div>
       </div>
     </div>
   </div>
+
 
   {{ template "rodape" }}
 </body>
